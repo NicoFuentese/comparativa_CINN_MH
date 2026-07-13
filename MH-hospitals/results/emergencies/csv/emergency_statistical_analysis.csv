@@ -1,0 +1,7 @@
+algo_a,algo_b,n_a,n_b,mean_a,std_a,mean_b,std_b,u_stat,p_value,rank_biserial_r,effect_magnitude,is_significant,better_algo
+GA,dPSO,50.00,50.00,1176.58,98.61,1202.49,143.84,1181.00,≥0.05,0.06,trivial,False,GA
+GA,SBOA,50.00,50.00,1176.58,98.61,1240.36,135.43,916.00,0.0215,0.27,small,True,GA
+GA,dMShOA,50.00,50.00,1176.58,98.61,1212.46,98.88,1024.00,≥0.05,0.18,small,False,GA
+dPSO,SBOA,50.00,50.00,1202.49,143.84,1240.36,135.43,1035.00,≥0.05,0.17,small,False,dPSO
+dPSO,dMShOA,50.00,50.00,1202.49,143.84,1212.46,98.88,1127.00,≥0.05,0.10,trivial,False,dPSO
+SBOA,dMShOA,50.00,50.00,1240.36,135.43,1212.46,98.88,1369.00,≥0.05,-0.10,trivial,False,dMShOA

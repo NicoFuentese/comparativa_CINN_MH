@@ -1,0 +1,5 @@
+algorithm,valid_simulations,makespan_min,makespan_median,makespan_avg,makespan_std,time_avg_s
+GA,50,991.16,1165.59,1176.58,98.61,48.50
+dPSO,50,988.82,1164.39,1202.49,143.84,57.05
+SBOA,50,1063.83,1208.14,1240.36,135.43,100.12
+dMShOA,50,1037.29,1199.28,1212.46,98.88,53.38

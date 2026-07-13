@@ -1,0 +1,13 @@
+Room,Operation_Sequence
+APR_1,6(Op1)
+APR_2,5(Op1) -> 7(Op1)
+APR_3,8(Op1) -> 4(Op1)
+APR_4,2(Op1) -> 3(Op1) -> 1(Op1)
+ARR_1,3(Op3) -> 1(Op3)
+ARR_2,8(Op3) -> 7(Op3)
+ARR_3,2(Op3) -> 4(Op3)
+ARR_4,5(Op3) -> 6(Op3)
+OR_1,8(Op2) -> 7(Op2)
+OR_2,5(Op2) -> 4(Op2)
+OR_3,2(Op2) -> 6(Op2)
+OR_4,3(Op2) -> 1(Op2)

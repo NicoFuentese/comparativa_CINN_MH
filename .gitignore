@@ -1,0 +1,19 @@
+# Virtual environments
+.venv/
+venv/
+env/
+.env
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDE
+.vscode/
+.idea/
+
+# Large raw data CSVs (>10 MB)
+CINN-KKT-hospitals/data/raw/*.csv
+MH-hospitals/data/real_surgeries_data.csv
