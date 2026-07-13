@@ -17,3 +17,5 @@ __pycache__/
 # Large raw data CSVs (>10 MB)
 CINN-KKT-hospitals/data/raw/*.csv
 MH-hospitals/data/real_surgeries_data.csv
+
+GEMINI.md

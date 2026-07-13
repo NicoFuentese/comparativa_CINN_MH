@@ -1,4 +1,4 @@
-# Pipeline de Benchmarking: CINN vs. Metaheurísticas (Q1 Journal)
+# Pipeline de Benchmarking: CINN vs. Metaheurísticas
 
 Este repositorio contiene el framework de evaluación comparativa entre el modelo **CINN** (Constrained-Informed Neural Network) y cuatro metaheurísticas estándar (**GA, dPSO, SBOA, dMShOA**) para el problema de programación de quirófanos (Three-Station Job Shop Scheduling).
 
@@ -29,7 +29,7 @@ MH-hospitals/.venv/Scripts/python metrics_analyzer.py
 
 ---
 
-## 📊 Interpretación de Métricas (Estándar Q1)
+## 📊 Interpretación de Métricas
 
 Para validar científicamente los resultados, utilizamos las siguientes métricas:
 
