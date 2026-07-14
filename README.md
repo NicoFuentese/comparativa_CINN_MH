@@ -67,3 +67,25 @@ Para validar científicamente los resultados, utilizamos las siguientes métrica
 *   `benchmark_runner.py`: Orquestador que carga los datos reales, entrena la red CINN y ejecuta las metaheurísticas bajo las mismas condiciones de semillas y datos.
 *   `metrics_analyzer.py`: Procesa `raw_results.csv` para realizar los tests no paramétricos y formatear la tabla Markdown.
 *   `raw_results.csv`: Base de datos de experimentos (150 registros).
+
+---
+
+## Estructura del Repositorio
+
+### CINN-KKT-hospitals/
+
+Modelo de optimizacion basado en **Constraint-Informed Neural Networks (CINN)** con condiciones KKT y ADMM. Resuelve el problema de Three-Station Job Shop Scheduling para programacion de cirugias hospitalarias.
+
+- **Tecnologias**: PyTorch, Pandas, NumPy, Matplotlib, Seaborn
+- **Version de referencia**: PyTorch 2.10.0+cpu (los resultados pueden variar segun la version de PyTorch)
+- **Post-procesamiento**: Hill Climbing / Simulated Annealing
+
+> Documentacion detallada en [CINN-KKT-hospitals/README.md](CINN-KKT-hospitals/README.md)
+
+### MH-hospitals/
+
+Framework de metaheuristicas para el mismo problema de scheduling quirurgico, con simulacion de cirugias electivas y de emergencia.
+
+- **Algoritmos**: GA (Genetic Algorithm), dPSO (Discrete Particle Swarm Optimization), SBOA, dMShOA
+- **Tecnologias**: NumPy, SciPy, Pandas, Matplotlib, Joblib
+- Incluye generacion de reportes, visualizaciones y analisis estadistico.
