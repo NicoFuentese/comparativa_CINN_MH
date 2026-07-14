@@ -80,8 +80,6 @@ Modelo de optimizacion basado en **Constraint-Informed Neural Networks (CINN)** 
 - **Version de referencia**: PyTorch 2.10.0+cpu (los resultados pueden variar segun la version de PyTorch)
 - **Post-procesamiento**: Hill Climbing / Simulated Annealing
 
-> Documentacion detallada en [CINN-KKT-hospitals/README.md](CINN-KKT-hospitals/README.md)
-
 ### MH-hospitals/
 
 Framework de metaheuristicas para el mismo problema de scheduling quirurgico, con simulacion de cirugias electivas y de emergencia.
