@@ -68,7 +68,7 @@ def get_shared_data(num_jobs, target_date="2023-02-01"):
 # WRAPPERS
 # =============================================================================
 
-def run_cinn(num_jobs, seed, device='cpu'):
+def run_cinn(num_jobs, seed, target_date, device='cpu'):
     """
     Wrapper for CINN model.
     """
@@ -83,7 +83,7 @@ def run_cinn(num_jobs, seed, device='cpu'):
     
     # 2. Build Tensors (using target_date and num_samples)
     p_medical, p_occupancy, J, I, R = build_daily_tensors(
-        df_clean, target_date="2023-02-01", num_samples=num_jobs, buffer_time=20.0, device=device
+        df_clean, target_date=target_date, num_samples=num_jobs, buffer_time=50.0, device=device
     )
     
     t0 = time.perf_counter()
@@ -101,7 +101,7 @@ def run_cinn(num_jobs, seed, device='cpu'):
     elapsed = time.perf_counter() - t0
     
     df_res = pd.DataFrame(best_tasks)
-    makespan = df_res['real_end'].max()
+    makespan = df_res['machine_end'].max()
     
     return makespan, elapsed
 
@@ -152,49 +152,56 @@ def run_mh(algo_name, num_jobs, seed, mh_data):
 
 def main():
     # As requested: Focusing on the 16 surgeries for that specific day
-    INSTANCES = [16] 
+    DATES = ["2023-02-01", "2023-06-14", "2023-10-13"]
+    INSTANCES = [8, 16]
     NUM_RUNS = 30
     MH_ALGOS = ['GA', 'dPSO', 'SBOA', 'dMShOA']
     
     results = []
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(f"Starting Benchmark on {device} (Real Data: 2023-02-01, 16 surgeries)...")
+    print(f"Starting Benchmark on {device}")
+    print(f"  Dates: {DATES}")
+    print(f"  Instances: {INSTANCES}")
 
-    for num_jobs in INSTANCES:
-        instance_name = f"RealDay_{num_jobs}Jobs"
-        print(f"\n>>> Running Instance: {instance_name}")
-        
-        # Get shared data once per instance
-        _, mh_data = get_shared_data(num_jobs)
-        
-        for run_i in range(NUM_RUNS):
-            print(f"    Run {run_i+1}/{NUM_RUNS}...", end='\r')
-            seed = run_i
+    for date in DATES:
+        for num_jobs in INSTANCES:
+            instance_name = f"{date}_{num_jobs}Jobs"
+            print(f"\n>>> Running Instance: {instance_name}")
             
-            # 1. Run CINN
-            makespan_cinn, time_cinn = run_cinn(num_jobs, seed, device=device)
-            results.append({
-                'Instance': instance_name,
-                'Algorithm': 'CINN',
-                'Run': run_i,
-                'Makespan': makespan_cinn,
-                'CPU_Time': time_cinn
-            })
+            _, mh_data = get_shared_data(num_jobs, target_date=date)
             
-            # 2. Run MHs
-            for algo in MH_ALGOS:
-                makespan_mh, time_mh = run_mh(algo, num_jobs, seed, mh_data)
+            for run_i in range(NUM_RUNS):
+                print(f"    Run {run_i+1}/{NUM_RUNS}...", end='\r')
+                seed = run_i
+                
+                # 1. Run CINN
+                makespan_cinn, time_cinn = run_cinn(num_jobs, seed, date, device=device)
                 results.append({
                     'Instance': instance_name,
-                    'Algorithm': algo,
+                    'Algorithm': 'CINN',
                     'Run': run_i,
-                    'Makespan': makespan_mh,
-                    'CPU_Time': time_mh
+                    'Makespan': makespan_cinn,
+                    'CPU_Time': time_cinn
                 })
+                
+                # 2. Run MHs
+                for algo in MH_ALGOS:
+                    makespan_mh, time_mh = run_mh(algo, num_jobs, seed, mh_data)
+                    results.append({
+                        'Instance': instance_name,
+                        'Algorithm': algo,
+                        'Run': run_i,
+                        'Makespan': makespan_mh,
+                        'CPU_Time': time_mh
+                    })
+            
+            # Save progressively after each date-instance
+            df_results = pd.DataFrame(results)
+            df_results.to_csv("raw_results.csv", index=False)
+            print(f"    Saved partial results ({len(results)} total rows)")
     
     print("\nBenchmark Finished!")
-    df_results = pd.DataFrame(results)
-    df_results.to_csv("raw_results.csv", index=False)
+    print(f"Total rows: {len(results)}")
     print("Saved results to raw_results.csv")
 
 if __name__ == "__main__":

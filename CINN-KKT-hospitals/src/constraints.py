@@ -22,8 +22,7 @@ def build_constraints_v2(start_times, p_medical, p_occupancy, machine_probs):
         g_seq = (start_times[:, i] + p_medical[:, i]) - start_times[:, i+1]
         g_list.append(g_seq)
         
-    # TIEMPO MÁXIMO DE ESPERA (W_max = 60 minutos) penalizar si propone que un paciente espere más de 60 min entre etapas.
-    W_max = 60.0 
+    W_max = 25.0 
     for i in range(start_times.shape[1] - 1):
         g_wait = (start_times[:, i+1] - (start_times[:, i] + p_medical[:, i])) - W_max
         g_list.append(g_wait)

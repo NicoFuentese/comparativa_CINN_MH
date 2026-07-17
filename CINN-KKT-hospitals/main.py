@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import random
 import numpy as np
+import time
 
 from src.data_loader import load_raw_data
 from src.data_cleaner import clean_clinical_data, build_daily_tensors
@@ -35,7 +36,7 @@ def main():
     p_medical, p_occupancy, J, I, R = build_daily_tensors(df_clean, 
                                                         target_date="2023-02-01", 
                                                         num_samples=16, 
-                                                        buffer_time=20.0, 
+                                                        buffer_time=50.0, 
                                                         device=device)
 
     #Inicializar Modelo
@@ -44,14 +45,16 @@ def main():
 
     #Entrenamiento
     print("\n[3/5] Entrenando con Restricciones KKT...")
-    model, s_pred, m_probs, training_history = train_model(model, p_medical, p_occupancy, J, I, R, device, MAX_STEPS=10000)
+    t0 = time.perf_counter()
+    model, s_pred, m_probs, training_history = train_model(model, p_medical, p_occupancy, J, I, R, device, MAX_STEPS=8000)
 
     # Post-Procesamiento (Hill Climbing)
     print("\n[4/5] Decodificando y aplicando Recocido Simulado...")
     task_data = extract_topology(s_pred, m_probs, p_medical, p_occupancy, J, I, R)
 
     #para usar SA
-    best_tasks = simulated_annealing_optimization(task_data, J, iterations=5000)
+    best_tasks = simulated_annealing_optimization(task_data, J, iterations=3000)
+    t1 = time.perf_counter()
 
     #para usar HC
     #best_tasks = hill_climbing_optimization(task_data, J, iterations=2000)
@@ -62,12 +65,13 @@ def main():
     df_final = pd.DataFrame(best_tasks)
     df_final.to_csv("data/processed/solucion_final_optimizada.csv", index=False)
     
-    makespan_final = df_final['real_end'].max()
+    makespan_final = df_final['machine_end'].max()
     plot_advanced_gantt(df_final, makespan_final, J)
     plot_wait_histograms(df_final)
 
     print("\n======================================================")
     print(f"Makespan Final: {makespan_final:.2f} min.")
+    print(f"Tiempo Total (Train + SA): {t1 - t0:.2f} s")
     print("  Archivos guardados en 'data/processed/'")
     print("======================================================")
 

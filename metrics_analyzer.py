@@ -108,6 +108,11 @@ def analyze_results(csv_path="raw_results.csv"):
     print("RPD: Relative Percentage Deviation (menor es mejor)")
     print("Time_Avg: Tiempo de CPU promedio en segundos")
 
+    # 7. Export to CSV
+    csv_output = "results_summary_q1.csv"
+    pivot_df.to_csv(csv_output)
+    print(f"\nTabla guardada en: {csv_output}")
+
 if __name__ == "__main__":
     # Suprimir advertencias de Wilcoxon para diferencias cero
     warnings.filterwarnings("ignore", message="Sample size too small")

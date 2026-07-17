@@ -9,7 +9,7 @@ import seaborn as sns
 sns.set_theme(style="whitegrid", context="paper", font_scale=1.2)
 
 #ploteo de carta gantt
-def plot_advanced_gantt(df, makespan, J, setup_mins=10.0, output_path="data/processed/gantt_final.png"):
+def plot_advanced_gantt(df, makespan, J, setup_mins=30.0, output_path="data/processed/gantt_final.png"):
     fig, ax = plt.subplots(figsize=(20, 12))
     colors = plt.cm.get_cmap('tab20', J)
     
@@ -80,7 +80,7 @@ def plot_wait_histograms(df, output_path="data/processed/esperas_histograma.png"
             if row_curr.empty or row_next.empty: continue
             
             end_curr = row_curr['real_end'].values[0]
-            start_next = row_next['real_start'].values[0]
+            start_next = row_next['surgery_start'].values[0]
             delays.append(start_next - end_curr)
             
         waits_dict[(stage_curr, stage_next)] = delays
@@ -118,7 +118,7 @@ def generar_estadisticas_bai(csv_path="data/processed/solucion_final_optimizada.
         print(f"Error: {csv_path} not found. Run the model first.")
         return
 
-    makespan = df['real_end'].max()
+    makespan = df['machine_end'].max()
     
     # ---------------------------------------------------------
     # CÁLCULO DE TIEMPOS DE ESPERA (Wait Times)
@@ -128,10 +128,10 @@ def generar_estadisticas_bai(csv_path="data/processed/solucion_final_optimizada.
         paciente_df = df[df['job_id'] == j].sort_values('stage_id')
         
         end_pre = paciente_df[paciente_df['stage_id'] == 0]['real_end'].values
-        start_qx = paciente_df[paciente_df['stage_id'] == 1]['real_start'].values
+        start_qx = paciente_df[paciente_df['stage_id'] == 1]['surgery_start'].values
         
         end_qx = paciente_df[paciente_df['stage_id'] == 1]['real_end'].values
-        start_post = paciente_df[paciente_df['stage_id'] == 2]['real_start'].values
+        start_post = paciente_df[paciente_df['stage_id'] == 2]['surgery_start'].values
         
         if len(end_pre)>0 and len(start_qx)>0:
             waits.append({'job_id': j, 'Phase': 'PRE -> QX', 'Wait (min)': start_qx[0] - end_pre[0]})
@@ -205,7 +205,7 @@ def generar_estadisticas_bai(csv_path="data/processed/solucion_final_optimizada.
         paciente_df = df[df['job_id'] == j]
         inicio_absoluto = paciente_df['real_start'].min()
         fin_absoluto = paciente_df['real_end'].max()
-        tiempo_ideal = paciente_df['dur_medical'].sum()
+        tiempo_ideal = paciente_df['dur_medical'].sum() + 50.0  # setup inicial + cleanup final
         
         flow_times.append({
             'Patient': f"P{j}",

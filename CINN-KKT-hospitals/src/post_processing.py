@@ -29,43 +29,45 @@ def extract_topology(s_pred, m_probs, p_time_medical, p_time_occupancy, J, I, R)
             })
     return task_data
 
-# --- MODIFICADO: Ahora calcula Makespan, Esperas Y Desbalance ---
-def calculate_metrics(tasks, J):
+# --- MODIFICADO: Calcula Makespan, Esperas Y Desbalance con Setup + Cleanup explicitos ---
+def calculate_metrics(tasks, J, setup_time=30.0, cleanup_time=20.0):
     machine_avail = {r: 0.0 for r in range(1, 13)} 
-    machine_work_time = {r: 0.0 for r in range(1, 13)} # Cuánto trabaja cada sala
+    machine_work_time = {r: 0.0 for r in range(1, 13)}
     job_avail = {j: 0.0 for j in range(J)}
-    tasks.sort(key=lambda x: x['pinn_start'])
     
     final_tasks = []
     total_wait_time = 0.0 
-    
-    for t in tasks:
-        j = t['job_id']
-        m_global = t['global_machine_id']
-        dur_med = t['dur_medical']
-        dur_occ = t['dur_occupancy']
-        
-        start_t = max(job_avail[j], machine_avail[m_global])
-        
-        if t['stage_id'] > 0: 
-            total_wait_time += (start_t - job_avail[j])
+
+    for stage in range(3):
+        stage_tasks = [t for t in tasks if t['stage_id'] == stage]
+        stage_tasks.sort(key=lambda x: x['pinn_start'])
+        for t in stage_tasks:
+            j = t['job_id']
+            m_global = t['global_machine_id']
+            dur_med = t['dur_medical']
             
-        end_t_patient = start_t + dur_med
-        end_t_machine = start_t + dur_occ
+            start_t = max(job_avail[j] - setup_time, machine_avail[m_global])
+            actual_start = start_t + setup_time
+            end_patient = actual_start + dur_med
+            end_machine = actual_start + dur_med + cleanup_time
+            
+            if t['stage_id'] > 0: 
+                total_wait_time += (actual_start - job_avail[j])
+                
+            job_avail[j] = end_patient
+            machine_avail[m_global] = end_machine
+            machine_work_time[m_global] += dur_med
+            
+            new_t = t.copy()
+            new_t['real_start'] = start_t
+            new_t['surgery_start'] = actual_start
+            new_t['real_end'] = end_patient
+            new_t['machine_end'] = end_machine
+            new_t['pinn_start'] = start_t 
+            final_tasks.append(new_t)
         
-        job_avail[j] = end_t_patient
-        machine_avail[m_global] = end_t_machine
-        machine_work_time[m_global] += dur_med # Acumulamos el trabajo de esta sala
-        
-        new_t = t.copy()
-        new_t['real_start'] = start_t
-        new_t['real_end'] = end_t_patient
-        new_t['pinn_start'] = start_t 
-        final_tasks.append(new_t)
-        
-    makespan = max([t['real_end'] for t in final_tasks])
+    makespan = max([t['machine_end'] for t in final_tasks])
     
-    # Calcular el desbalance (Desviación estándar del tiempo trabajado por etapa)
     desbalance_total = 0.0
     for stage in range(3):
         cargas_etapa = [machine_work_time[m] for m in range((stage*4)+1, (stage*4)+5)]
