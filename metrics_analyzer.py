@@ -96,6 +96,9 @@ def analyze_results(csv_path="raw_results.csv"):
     cols = ['CINN'] + algorithms
     pivot_df = pivot_df.reindex(columns=cols, level=1)
 
+    # 5b. Add BKS column (Best Known Solution per instance in minutes)
+    pivot_df['BKS (min)'] = bks.round(1)
+
     # 6. Print Markdown
     print("\n" + "="*80)
     print("      TABLA EXPERIMENTAL FINAL (Q1 JOURNAL FORMAT)")
